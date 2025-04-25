@@ -1,5 +1,5 @@
 import {
-	Controls,
+
 	MOUSE,
 	Quaternion,
 	Spherical,
