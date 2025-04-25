@@ -31,10 +31,12 @@ function animate() {
   controls.update();
   renderer.render(scene, camera);
 }
-animate();
+
 
 
 const bgLoader = new TextureLoader();
 bgLoader.load('./assets/background.png', (texture) => {
   scene.background = texture;
 });
+
+animate();
