@@ -5,12 +5,13 @@ import { GLTFLoader } from './libs/GLTFLoader.js';
 
 import { TextureLoader } from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
+scene.background = new THREE.Color(0x202020);
+
+
 const bgLoader = new TextureLoader();
 bgLoader.load('./assets/background.png', (texture) => {
   scene.background = texture;
 });
-
-scene.background = new THREE.Color(0x202020);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
