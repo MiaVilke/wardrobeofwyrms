@@ -35,7 +35,7 @@ function animate() {
 
 
 const bgLoader = new TextureLoader();
-bgLoader.load('./assets/background.png', (texture) => {
+bgLoader.load('assets/background.png', (texture) => {
   scene.background = texture;
 });
 
