@@ -32,11 +32,17 @@ const texture = textureLoader.load('guy.jpg'); // Or whatever your texture file 
 
     const loader = new OBJLoader();
     loader.load('guy.obj', (obj) => {
-      scene.add(obj);
-    }, undefined, (error) => {
-      console.error('Error loading OBJ:', error);
-    });
+  currentModel = obj;
 
+  obj.traverse((child) => {
+    if (child.isMesh) {
+      child.material.map = texture;
+      child.material.needsUpdate = true;
+    }
+  });
+
+  scene.add(obj);
+});
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
