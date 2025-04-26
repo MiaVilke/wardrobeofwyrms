@@ -30,8 +30,12 @@ const texture = textureLoader.load('guy.jpg'); // Or whatever your texture file 
     light.position.set(1, 1, 1);
     scene.add(light);
 
-    const loader = new OBJLoader();
-    loader.load('guy.obj', (obj) => {
+let currentModel; // Declare it at the top
+
+const loader = new OBJLoader();
+const texture = new THREE.TextureLoader().load('guy.jpg');
+
+loader.load('guy.obj', (obj) => {
   currentModel = obj;
 
   obj.traverse((child) => {
@@ -41,7 +45,9 @@ const texture = textureLoader.load('guy.jpg'); // Or whatever your texture file 
     }
   });
 
-  scene.add(obj);
+  scene.add(currentModel);
+}, undefined, (error) => {
+  console.error('Error loading OBJ:', error);
 });
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
