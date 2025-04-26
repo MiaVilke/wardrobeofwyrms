@@ -51,7 +51,10 @@ loader.load('guy.obj', (obj) => {
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
-
+    const customMaterial = new THREE.MeshStandardMaterial({
+  color: 0xff00ff,  // bright fallback color
+  map: texture
+});
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
