@@ -38,7 +38,7 @@
         obj.traverse((child) => {
           if (child.isMesh) {
             // Replace material with texture material
-            child.material = new THREE.MeshStandardMaterial({
+            child.material = new THREE.MeshBasicMaterial({
               map: texture,
               metalness: 0.2,
               roughness: 0.8
