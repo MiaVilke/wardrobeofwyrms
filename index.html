@@ -27,6 +27,13 @@ import { OBJLoader } from 'https://esm.sh/three@0.158.0/examples/jsm/loaders/OBJ
     light.position.set(1, 1, 1);
     scene.add(light);
 
+
+  const testBox = new THREE.Mesh(
+  new THREE.BoxGeometry(),
+  new THREE.MeshStandardMaterial({ map: texture })
+);
+testBox.position.set(-2, 0, 0);
+scene.add(testBox);
 let currentModel; // Declare it at the top
 
 const loader = new OBJLoader();
@@ -37,21 +44,26 @@ const customMaterial = new THREE.MeshStandardMaterial({
   map: texture
 });
 
-loader.load('guy.obj', (obj) => {
-  currentModel = obj;
+loader.load(
+  'guy.obj',
+  (obj) => {
+    currentModel = obj;
 
-  obj.traverse((child) => {
-    if (child.isMesh) {
-      child.material.dispose(); // 🔥 kill the old material
-      child.material = customMaterial; // 🎨 apply your texture+color
-    }
-  });
+    obj.traverse((child) => {
+      if (child.isMesh) {
+        child.material.dispose(); // dispose old material
+        child.material = customMaterial; // apply your texture
+        child.material.needsUpdate = true;
+      }
+    });
 
-  scene.add(currentModel);
-});
- undefined, (error) => {
-  console.error('Error loading OBJ:', error);
-};
+    scene.add(currentModel);
+  },
+  undefined,
+  (error) => {
+    console.error('Error loading OBJ:', error);
+  }
+);
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
