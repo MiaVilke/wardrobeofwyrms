@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Texture Test</title>
+  <title>OBJ with Texture</title>
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
@@ -12,6 +12,7 @@
   <script type="module">
     import * as THREE from 'https://esm.sh/three@0.158.0';
     import { OrbitControls } from 'https://esm.sh/three@0.158.0/examples/jsm/controls/OrbitControls.js';
+    import { OBJLoader } from 'https://esm.sh/three@0.158.0/examples/jsm/loaders/OBJLoader.js';
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -20,7 +21,7 @@
     document.body.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    camera.position.z = 3;
+    camera.position.z = 5;
 
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
@@ -29,18 +30,30 @@
     // ✅ Load the texture
     const texture = new THREE.TextureLoader().load('guy.jpg');
 
-    // ✅ Create a material using the texture
-    const material = new THREE.MeshStandardMaterial({
-      map: texture,
-    });
+    // ✅ Load the OBJ model
+    const loader = new OBJLoader();
+    loader.load(
+      'guy.obj',
+      (obj) => {
+        obj.traverse((child) => {
+          if (child.isMesh) {
+            // Replace material with texture material
+            child.material = new THREE.MeshStandardMaterial({
+              map: texture,
+              metalness: 0.2,
+              roughness: 0.8
+            });
+            child.material.needsUpdate = true;
+          }
+        });
 
-    // ✅ Create a cube geometry and apply the material
-    const cube = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      material
+        scene.add(obj);
+      },
+      undefined,
+      (error) => {
+        console.error('Error loading OBJ:', error);
+      }
     );
-
-    scene.add(cube);
 
     // ✅ Resize handling
     window.addEventListener('resize', () => {
@@ -52,7 +65,6 @@
     // ✅ Animate
     function animate() {
       requestAnimationFrame(animate);
-      cube.rotation.y += 0.01;
       controls.update();
       renderer.render(scene, camera);
     }
