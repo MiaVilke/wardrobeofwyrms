@@ -12,64 +12,49 @@
   <script type="module">
     import * as THREE from 'https://esm.sh/three@0.158.0';
     import { OrbitControls } from 'https://esm.sh/three@0.158.0/examples/jsm/controls/OrbitControls.js';
+    import { MTLLoader } from 'https://esm.sh/three@0.158.0/examples/jsm/loaders/MTLLoader.js';
     import { OBJLoader } from 'https://esm.sh/three@0.158.0/examples/jsm/loaders/OBJLoader.js';
-
+    
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
-
+    
     const controls = new OrbitControls(camera, renderer.domElement);
-    camera.position.z = 5;
-
+    camera.position.z = 3;
+    
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
     scene.add(light);
-
-    // ✅ Load the texture
-    const texture = new THREE.TextureLoader().load('guy.jpg');
-
-    // ✅ Load the OBJ model
-    const loader = new OBJLoader();
-    loader.load(
-      'guy.obj',
-      (obj) => {
-        obj.traverse((child) => {
-          if (child.isMesh) {
-            // Replace material with texture material
-            child.material = new THREE.MeshBasicMaterial({
-              map: texture,
-              metalness: 0.2,
-              roughness: 0.8
-            });
-            child.material.needsUpdate = true;
-          }
-        });
-
+    
+    // ✅ Load .mtl first
+    const mtlLoader = new MTLLoader();
+    mtlLoader.load('guy.mtl', (materials) => {
+      materials.preload();
+    
+      const objLoader = new OBJLoader();
+      objLoader.setMaterials(materials); // 👈 IMPORTANT
+      objLoader.load('guy.obj', (obj) => {
         scene.add(obj);
-      },
-      undefined,
-      (error) => {
+      }, undefined, (error) => {
         console.error('Error loading OBJ:', error);
-      }
-    );
-
-    // ✅ Resize handling
+      });
+    });
+    
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
-
-    // ✅ Animate
+    
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
     }
-
+    
     animate();
-  </script>
+    </script>
 </body>
 </html>
