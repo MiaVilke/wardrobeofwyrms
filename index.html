@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>3D OBJ Viewer</title>
+  <title>Texture Test</title>
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
@@ -12,7 +12,6 @@
   <script type="module">
     import * as THREE from 'https://esm.sh/three@0.158.0';
     import { OrbitControls } from 'https://esm.sh/three@0.158.0/examples/jsm/controls/OrbitControls.js';
-    import { OBJLoader } from 'https://esm.sh/three@0.158.0/examples/jsm/loaders/OBJLoader.js';
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -21,58 +20,40 @@
     document.body.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    camera.position.z = 5;
+    camera.position.z = 3;
 
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
     scene.add(light);
 
-    let currentModel;
-
-    // ✅ Load the texture BEFORE using it
+    // ✅ Load the texture
     const texture = new THREE.TextureLoader().load('guy.jpg');
 
-    // ✅ Create the material using the texture
-    const customMaterial = new THREE.MeshStandardMaterial({
-      color: 0xff00ff, // fallback magenta if texture fails
+    // ✅ Create a material using the texture
+    const material = new THREE.MeshStandardMaterial({
       map: texture,
-      metalness: 0.2,
-      roughness: 0.8
+      color: 0xff00ff // fallback magenta for testing
     });
 
-    // ✅ Load the OBJ model
-    const loader = new OBJLoader();
-    loader.load(
-      'guy.obj',
-      (obj) => {
-        currentModel = obj;
-
-        obj.traverse((child) => {
-          if (child.isMesh) {
-            child.material.dispose(); // 🔥 remove old material
-            child.material = customMaterial; // 🎨 apply texture
-            child.material.needsUpdate = true;
-          }
-        });
-
-        scene.add(currentModel);
-      },
-      undefined,
-      (error) => {
-        console.error('Error loading OBJ:', error);
-      }
+    // ✅ Create a cube geometry and apply the material
+    const cube = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      material
     );
 
-    // ✅ Handle resizing
+    scene.add(cube);
+
+    // ✅ Resize handling
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // ✅ Animation loop
+    // ✅ Animate
     function animate() {
       requestAnimationFrame(animate);
+      cube.rotation.y += 0.01;
       controls.update();
       renderer.render(scene, camera);
     }
