@@ -32,29 +32,32 @@ let currentModel; // Declare it at the top
 const loader = new OBJLoader();
 const texture = new THREE.TextureLoader().load('guy.jpg');
 
+const customMaterial = new THREE.MeshStandardMaterial({
+  color: 0xff00ff,  // bright fallback color
+  map: texture
+});
+
 loader.load('guy.obj', (obj) => {
   currentModel = obj;
 
   obj.traverse((child) => {
     if (child.isMesh) {
-      child.material.map = texture;
-      child.material.needsUpdate = true;
+      child.material.dispose(); // 🔥 kill the old material
+      child.material = customMaterial; // 🎨 apply your texture+color
     }
   });
 
   scene.add(currentModel);
-}, undefined, (error) => {
-  console.error('Error loading OBJ:', error);
 });
+ undefined, (error) => {
+  console.error('Error loading OBJ:', error);
+};
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
-    const customMaterial = new THREE.MeshStandardMaterial({
-  color: 0xff00ff,  // bright fallback color
-  map: texture
-});
+
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
